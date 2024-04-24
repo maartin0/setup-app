@@ -109,8 +109,11 @@ sudo systemctl start setup-app
 
 ## Screenshots
 Screenshot of the user control panel (at `/user`):
+
 ![user-control-panel](https://github.com/maartin0/setup-app/assets/16228305/2a54e4ad-e2a1-4d82-b29b-b568b36e955b)
+
 Screenshot of the bulk account creation tool (at `/bulk`):
+
 ![bulk-creation-tool](https://github.com/maartin0/setup-app/assets/16228305/56080729-4fcb-4f9e-8723-f06596cff134)
 
 ## How authentication works
