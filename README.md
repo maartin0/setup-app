@@ -108,7 +108,10 @@ sudo systemctl start setup-app
 * $HOME/.config/code-server/config.yaml
 
 ## Screenshots
-TODO
+Screenshot of the user control panel (at `/user`):
+![user-control-panel](https://github.com/maartin0/setup-app/assets/16228305/2a54e4ad-e2a1-4d82-b29b-b568b36e955b)
+Screenshot of the bulk account creation tool (at `/bulk`):
+![bulk-creation-tool](https://github.com/maartin0/setup-app/assets/16228305/56080729-4fcb-4f9e-8723-f06596cff134)
 
 ## How authentication works
 There's two separate authentication methods here. The app's own control panel itself and `code-server`'s authentication.
@@ -122,3 +125,59 @@ The method used by this app is via the `hashed-password` property which has a bi
 
 ## Security considerations
 This has been designed for use on a sandboxed virtual machine on a closed local network. Expose to the internet at your own risk.
+
+## Request flowchart
+Although this isn't the easiest to read, it may help if you're trying to understand the flows behind how this works
+```mermaid
+flowchart
+    start["`client sends request on port 80`"] --> nginx
+    nginx --> user["`/user?key=...&action=...`"]
+    user --> hash["`hash key and look for username match in tokens.json`"]
+    hash --> found{"`username found?`"}
+    found -- no --> unauthorised["`return unauthorised`"]
+    found -- yes --> getaction["`get action property`"]
+    getaction -- generate --> callgenssh["`call gen-ssh-key.sh`"]
+    callgenssh --> gensshresult["`render result.html with generated key`"]
+    getaction -- None --> userhtml["`return user.html`"]
+    getaction -- launch --> callinitvscode["`call init-vscode.sh`"]
+    callinitvscode --> configyaml{"`does the user have a config.yaml?`"}
+    configyaml -- no --> initconfigyaml["`initialise with template`"]
+    initconfigyaml --> portcached{"`does the user have a cached port?`"}
+    configyaml -- yes --> portcached
+    portcached -- no --> incrementcounter["`Store and increment the port counter by one`"]
+    incrementcounter --> writeport["`Write port to config.yaml`"]
+    portcached -- yes --> writeport
+    writeport --> nginxmod["`Overwrite /etc/nginx/setup-app/$USERNAME.conf with template and port`"]
+    nginxmod --> confighash{"`does the config have a password hash?`"}
+    confighash -- no --> defaultprovided{"`Was a default password hash provided?`"}
+    defaultprovided -- yes --> insertprovided["`insert provided hash to config`"]
+    defaultprovided -- no --> generatepwd["`generate, hash and insert random value`"]
+    insertprovided --> restartcode
+    generatepwd --> restartcode["`restart code-server if config was changed at any point`"]
+    confighash -- yes --> restartcode
+    restartcode --> restartnginx["`restart nginx if port was updated`"]
+    restartnginx --> redirectcode["`redirect to /code/$USERNAME`"]
+    nginx --> bulk["`/bulk?key=...`"]
+    bulk --> hashbulk["`hash key and match token in tokens.json with username`"]
+    hashbulk --> bulkusernamefound{"`username found?`"}
+    bulkusernamefound -- no --> unauthorised
+    bulkusernamefound -- yes --> isadmin{"`is user an administrator?`"}
+    isadmin -- no --> unauthorised
+    isadmin -- yes --> getmethod["`Get method`"]
+    getmethod -- GET --> returnbulk["`return bulk.html`"]
+    getmethod -- POST --> getuser["`Get next username in provided form`"]
+    getuser --> userfound{"`Was a user found? (i.e. have we gone through all of them)`"}
+    userfound -- yes --> userexists{"`Does the user exist?`"}
+    userfound -- no --> bulkreturn["`Return generated data`"]
+    userexists -- no --> getuser
+    userexists -- yes --> initialiseuser["`Call initialise-user.sh to initialise the user if it doesn't already exist`"]
+    initialiseuser --> shouldgenurl{"`Did the form request URLs to be generated?`"}
+    shouldgenurl -- no --> getuser
+    shouldgenurl -- yes --> genkey["`Generate key`"]
+    genkey --> hashkey["`Hash the generated key using hash-login-key.sh`"]
+    hashkey --> storetoken["`Store the hashed key in tokens.json`"]
+    storetoken --> addentry["`Append user and token to csv result buffer`"]
+    addentry --> getuser
+    nginx --> code["`/code/$USERNAME`"]
+    code --> proxy["`Forwarded by nginx to configured code-server instance running on the defined port for that user`"]
+```
