@@ -1,0 +1,7 @@
+code-server
+lastport.txt
+tokens.json
+*.deb
+.vscode
+run
+.env

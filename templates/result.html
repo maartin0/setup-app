@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+</head>
+<body>
+    <h3>Output</h3>
+    <button id="download-btn" onClick="downloadData()" hidden>Download {{ filename }}</button><br />
+    <textarea readonly>{{ log_output }}</textarea><br />
+    <a href="?key={{ auth_key }}">Go back</a>
+    <script>
+        const filename = "{{ filename }}";
+        const data = `{{ data }}`;
+        function downloadData() { // (download hack from: https://stackoverflow.com/a/18197341)
+            const temp = document.createElement('a');
+            temp.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
+            temp.setAttribute('download', filename);
+            temp.style.display = 'none';
+            document.body.appendChild(temp);
+            temp.click();
+            document.body.removeChild(temp);
+        }
+        if (filename && data) document.getElementById("download-btn").removeAttribute("hidden");
+    </script>
+</body>
+</html>

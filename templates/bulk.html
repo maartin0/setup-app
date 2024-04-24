@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bulk account setup form</title>
+    <style>
+        #actions li:not(.empty) {
+            list-style-type: none;
+            margin-left: -21px;
+        }
+    </style>
+</head>
+<body>
+    <form action="#" method="POST">
+        <div>
+            <h3>1. Enter list of usernames (separated by newlines, must be only alphanumeric)</h3>
+            <textarea name="usernames" required></textarea>
+            <p>Any existing usernames will be skipped</p>
+        </div>
+        <div id="actions">
+            <h3>2. Select actions</h3>
+            <ul>
+                <li class="empty">Create user (if it doesn't already exist)</li>
+                <li class="empty">Create home directory (if it doesn't already exist)</li>
+                <li class="empty">Allow user to create their own VS code instance</li>
+                <li><label><input name="generate_url" type="checkbox" checked>Generate login URL</label></li>
+                <li><label><input name="purge_existing_urls" type="checkbox">Purge any existing login URLs</label></li>
+            </ul>
+        </div>
+        <input type="hidden" name="auth_key" value="{{ auth_key_raw }}">
+        <button type="sumbit">Run</button>
+    </form>
+    <p>Tip: To make another user an administrator, add them to the sudoers group: sudo usermod -aG sudo username</username></p>
+    <a href="?key={{ auth_key }}">Go back</a>
+</body>
+</html>

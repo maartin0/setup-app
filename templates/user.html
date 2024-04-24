@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User control panel</title>
+</head>
+<body>
+    <span>To connect via SSH, run in a command prompt:</span>
+    <span>ssh {{username}}@{{hostname}}</span>
+    <ul>
+        <li><a href="?action=launch&key={{ auth_key }}">Launch VS code</a> - TIP: you can copy this link and create a bookmark (usually Ctrl+D) to automatically launch and login to vs-code</li>
+        <li><form action="#" method="POST">
+            <input type="password" name="new_password" autocomplete="new-password">
+            <input type="hidden" name="auth_key" value="{{ auth_key_raw }}">
+            <button type="submit">Update password</button>
+        </form></li>
+        <li><a href="?action=generate&key={{ auth_key }}">Generate SSH key</a></li>
+        <li><a href="https://oit.ua.edu/wp-content/uploads/2020/12/Linux_bash_cheat_sheet-1.pdf">Bash cheatsheet</a></li>
+        <li id="admin-link" hidden><a href="bulk?key={{ auth_key }}">Administrator tools</a></li>
+    </ul>
+    <script>
+        if ("{{ admin }}") {
+            document.getElementById("admin-link").removeAttribute("hidden");
+        }
+    </script>
+</body>
+</html>

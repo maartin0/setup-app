@@ -1,0 +1,13 @@
+[Unit]
+Description=setup-app
+After=network.target
+
+[Service]
+Type=exec
+ExecStart=/srv/setup-app/run.sh
+WorkingDirectory=/srv/setup-app/
+Restart=always
+User=root
+
+[Install]
+WantedBy=default.target
