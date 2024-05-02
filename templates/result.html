@@ -5,8 +5,9 @@
 </head>
 <body>
     <h3>Output</h3>
-    <button id="download-btn" onClick="downloadData()" hidden>Download {{ filename }}</button><br />
-    <textarea readonly>{{ log_output }}</textarea><br />
+    <button id="download-btn" onClick="downloadData()" hidden>Download {{ filename }}</button><br />\
+    <textarea id="log" readonly>{{ log_output }}</textarea><br />
+    <a id="ssh-key-help" target="_blank" href="https://gist.github.com/maartin0/9cc943668c0f98a3c9f082fc6e0266f2" hidden>How to install a pre-generated SSH key</a><br />
     <a href="?key={{ auth_key }}">Go back</a>
     <script>
         const filename = "{{ filename }}";
@@ -21,6 +22,7 @@
             document.body.removeChild(temp);
         }
         if (filename && data) document.getElementById("download-btn").removeAttribute("hidden");
+        if (document.getElementById("log")?.value?.includes("BEGIN OPENSSH PRIVATE KEY")) document.getElementById("ssh-key-help").removeAttribute("hidden");
     </script>
 </body>
 </html>

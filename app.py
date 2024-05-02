@@ -41,7 +41,7 @@ SESSION_COOKIE_NAME = "code-server-session"
 AUTH_GET_KEY_NAME = "key"
 TOKEN_STORE_LOCATION = "./tokens.json"
 PORT_COUNTER_LOCATION = "./lastport.txt"
-PASSWORD_MIN_LENGTH = environment_defaults["PASSWORD_MIN_LENGTH"]
+PASSWORD_MIN_LENGTH = int(environment_defaults["PASSWORD_MIN_LENGTH"])
 BIND_PORT = int(environment_defaults["BIND_PORT"])
 START_PORT = int(environment_defaults["START_PORT"])
 HOSTNAME = environment_defaults["HOSTNAME"]
@@ -137,7 +137,7 @@ def bulk():
     username = parse_auth(auth_key, True)
     if is_blank(username):
         return MISSING_AUTH_RESPONSE
-    return render_template('bulk.html', auth_key_raw=auth_key, auth_key=urllib.parse.quote(auth_key))
+    return render_template('bulk.html', auth_key_raw=auth_key)
 
 @app.route("/bulk", methods=["POST"])
 def bulk_run():
